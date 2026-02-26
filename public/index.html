@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkShort </title>
+    <style>
+        /* Design/CSS Part */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f7; margin: 0; padding: 40px; text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        .input-group { margin: 20px 0; display: flex; gap: 10px; justify-content: center; }
+        input { padding: 12px; width: 60%; border: 2px solid #ddd; border-radius: 8px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #007bff; }
+        button { padding: 12px 25px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        
+        /* Table Design */
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: white; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
+        th { background-color: #f8f9fa; color: #555; }
+        tr:hover { background-color: #f1f1f1; }
+        .short-url { color: #007bff; font-weight: bold; text-decoration: none; }
+        #result-box { margin-top: 20px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>URL Shortener</h1>
+    <p>Past current URL</p>
+
+    <div class="input-group">
+        <input type="text" id="longUrl" placeholder="https://example.com/very-long-link">
+        <button onclick="shortenUrl()">Shorten</button>
+    </div>
+
+    <div id="result-box"></div>
+
+    <h2> Live Analytics</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Original URL</th>
+                <th>Short Link</th>
+                <th>Clicks</th>
+            </tr>
+        </thead>
+        <tbody id="linkTable">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    // 1. Naya Link Banane ka Function
+    async function shortenUrl() {
+        const urlInput = document.getElementById('longUrl');
+        const resultBox = document.getElementById('result-box');
+        
+        if (!urlInput.value) return alert("Please enter URL!");
+
+        const response = await fetch('/shorten', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ longUrl: urlInput.value })
+        });
+
+        const data = await response.json();
+
+        if (data.shortUrl) {
+            resultBox.style.display = "block";
+            resultBox.innerHTML = `Success! link: <a href="${data.shortUrl}" target="_blank" class="short-url">${data.shortUrl}</a>`;
+            urlInput.value = ""; // Input saaf kar do
+            fetchTableData(); // Table refresh karo
+        }
+    }
+
+    // 2. Table mein Data Load karne ka Function
+    async function fetchTableData() {
+        try {
+            const response = await fetch('/all-links');
+            const links = await response.json();
+            const tableBody = document.getElementById('linkTable');
+            
+            tableBody.innerHTML = links.map(link => `
+                <tr>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        ${link.longUrl}
+                    </td>
+                    <td>
+                        <a href="/${link.shortId}" target="_blank" class="short-url">/${link.shortId}</a>
+                    </td>
+                    <td style="font-weight: bold; color: #28a745;">${link.clicks || 0}</td>
+                </tr>
+            `).join('');
+        } catch (err) {
+            console.error("Data missing", err);
+        }
+    }
+
+    // Page load hote hi table dikhao
+    fetchTableData();
+
+    // Har 5 second mein clicks auto-refresh karne ke liye (Optional)
+    setInterval(fetchTableData, 5000);
+</script>
+
+</body>
+</html>
