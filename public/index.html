@@ -9,27 +9,140 @@
 
 
     <style>
-        /* Design/CSS Part */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f7; margin: 0; padding: 40px; text-align: center; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        .input-group { margin: 20px 0; display: flex; gap: 10px; justify-content: center; }
-        input { padding: 12px; width: 60%; border: 2px solid #ddd; border-radius: 8px; outline: none; transition: 0.3s; }
-        input:focus { border-color: #007bff; }
-        button { padding: 12px 25px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #0056b3; }
-        
-        /* Table Design */
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: white; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        th { background-color: #f8f9fa; color: #555; }
-        tr:hover { background-color: #f1f1f1; }
-        .short-url { color: #007bff; font-weight: bold; text-decoration: none; }
-        #result-box { margin-top: 20px; padding: 15px; background: #d4edda; color: #155724; border-radius: 8px; display: none; }
+      
+    /* Basic Styling */
+    body { 
+        font-family: 'Segoe UI', sans-serif; 
+        background-color: #f4f7f6; 
+        margin: 0; 
+        padding: 10px; /* Phone par padding kam rakhi hai */
+    }
+
+    .container { 
+        max-width: 600px; 
+        margin: 20px auto; 
+        background: white; 
+        padding: 20px; 
+        border-radius: 20px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    }
+
+    /* Header styling */
+    .header {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 25px;
+    }
+
+    /* Input Group - Phone par ek ke niche ek aayega */
+    .input-group { 
+        display: flex; 
+        flex-direction: column; /* Mobile first */
+        gap: 10px; 
+    }
+
+    input { 
+        padding: 15px; 
+        border: 2px solid #eee; 
+        border-radius: 12px; 
+        font-size: 16px; 
+    }
+
+    button { 
+        padding: 15px; 
+        background: #007bff; 
+        color: white; 
+        border: none; 
+        border-radius: 12px; 
+        font-weight: bold; 
+        cursor: pointer;
+    }
+
+    /* Table ko Mobile par Card jaisa dikhane ke liye */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    
+    th { display: none; } /* Mobile par headings chupa do */
+
+    tr { 
+        display: block; 
+        background: #fafafa; 
+        margin-bottom: 15px; 
+        padding: 10px; 
+        border-radius: 10px; 
+        border: 1px solid #eee;
+    }
+    .container { 
+    max-width: 600px; 
+    margin: 20px auto; 
+    background: white; 
+    padding: 20px; 
+    border-radius: 20px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    text-align: center; /* Saara text center karne ke liye */
+}
+
+.input-group { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    align-items: center; /* Items ko horizontally center karne ke liye */
+    width: 100%;
+}
+
+input { 
+    padding: 15px; 
+    border: 2px solid #eee; 
+    border-radius: 12px; 
+    font-size: 16px; 
+    width: 100%; /* Phone par thodi jagah side mein chhodne ke liye */
+    box-sizing: border-box; /* Padding se width na badhe isliye */
+}
+
+button { 
+    padding: 15px; 
+    width: 30%; /* Button bhi input jitna bada dikhega */
+    background: #007bff; 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    font-weight: bold; 
+}
+
+    td { 
+        display: block; 
+        text-align: right; 
+        font-size: 14px; 
+        border: none;
+        padding: 5px 0;
+    }
+
+    td::before { 
+        content: attr(data-label); 
+        float: left; 
+        font-weight: bold; 
+        color: #888;
+    }
+
+    /* Laptop/Desktop ke liye wapis normal table */
+    @media (min-width: 600px) {
+        body { padding: 40px; }
+        .input-group { flex-direction: row; }
+        input { width: 70%; }
+        tr { display: table-row; background: none; }
+        td { display: table-cell; text-align: left; border-bottom: 1px solid #eee; }
+        th { display: table-cell; }
+        td::before { content: none; }
+    }
+
     </style>
+
 </head>
 <body>
-
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <span style="font-size: 24px; cursor: pointer;" onclick="location.reload()"> Home</span>
+    
+</div>
 <div class="container">
     <h1>URL Shortener</h1>
     <p>Past current URL</p>
@@ -49,8 +162,9 @@
                 <th>Short Link</th>
                 <th>Clicks</th>
             </tr>
-        </thead>
-        <tbody id="linkTable">
+            <button onclick="clearHistory()" style="background:#ff4757; margin-top: 30px; width: auto; padding: 10px 20px; font-size: 14px;">
+    Clear All History
+</button>
             </tbody>
     </table>
 </div>
@@ -87,15 +201,32 @@
             const tableBody = document.getElementById('linkTable');
             
             tableBody.innerHTML = links.map(link => `
-                <tr>
-                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${link.longUrl}
-                    </td>
-                    <td>
-                        <a href="/${link.shortId}" target="_blank" class="short-url">/${link.shortId}</a>
-                    </td>
-                    <td style="font-weight: bold; color: #28a745;">${link.clicks || 0}</td>
-                </tr>
+    <tr>
+        <td data-label="Original">${link.longUrl}</td>
+        <td data-label="Short Link">
+            <a href="/${link.shortId}" target="_blank" class="short-url">/${link.shortId}</a>
+        </td>
+        <td data-label="Clicks">${link.clicks || 0}</td>
+        <td data-label="Action">
+            <button onclick="shareLink('${link.shortId}')" style="padding: 5px 10px; background:#28a745;">Share</button>
+        </td>
+    </tr>
+td { 
+    display: flex; 
+    justify-content: space-between; /* Label left mein, value right mein */
+    align-items: center;
+    font-size: 14px; 
+    border: none;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+td:last-child {
+    border-bottom: none;
+    justify-content: center; /* Share button center mein rahe */
+}
+    <button onclick="shareLink('${link.shortId}')" style="background:#28a745; padding: 5px 5px;">Share</button>
+</td>
             `).join('');
         } catch (err) {
             console.error("Data missing", err);
@@ -114,7 +245,35 @@
       navigator.serviceWorker.register('/sw.js');
     });
   }
+  // Share Function
+function shareLink(shortId) {
+    const fullUrl = `https://url-shortener-piqo.onrender.com/${shortId}`;
+    if (navigator.share) {
+        navigator.share({ title: 'Short Link', url: fullUrl });
+    } else {
+        alert("Link copied: " + fullUrl);
+        navigator.clipboard.writeText(fullUrl);
+    }
+}
 
+// Clear History
+async function clearHistory() {
+    if(confirm(" Delete all history?")) {
+        await fetch('/clear-all', { method: 'DELETE' });
+        fetchTableData();
+    }
+}
+function shareApp() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Piqo Linker',
+            text: 'Check out this cool URL Shortener App!',
+            url: 'https://url-shortener-piqo.onrender.com'
+        });
+    } else {
+        alert("Copy this link: https://url-shortener-piqo.onrender.com");
+    }
+}
 </script>
 
 </body>

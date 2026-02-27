@@ -35,3 +35,8 @@ app.get('/:shortId', async (req, res) => {
 });
 
 app.listen(3000, () => console.log("Server ON: http://localhost:3000"));
+app.delete('/clear-all', (req, res) => {
+    db.remove({}, { multi: true }, (err, numRemoved) => {
+        res.json({ message: "History Cleared!" });
+    });
+});
