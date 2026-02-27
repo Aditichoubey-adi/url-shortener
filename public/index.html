@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkShort </title>
+    <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#007bff">
     <style>
         /* Design/CSS Part */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f7; margin: 0; padding: 40px; text-align: center; }
@@ -103,6 +105,12 @@
 
     // Har 5 second mein clicks auto-refresh karne ke liye (Optional)
     setInterval(fetchTableData, 5000);
+    // Service Worker register karna
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
 </script>
 
 </body>
