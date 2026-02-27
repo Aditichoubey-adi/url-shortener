@@ -11,7 +11,8 @@ app.post('/shorten', async (req, res) => {
     const { longUrl } = req.body;
     const shortId = nanoid(6);
     await db.insert({ shortId, longUrl, clicks: 0 });
-    res.json({ shortUrl: `http://localhost:3000/${shortId}`, shortId });
+    // index.js mein jahan link banta hai
+const shortUrl = `https://url-shortener-piqo.onrender.com/${shortId}`;
 });
 // Saare links ek saath dekhne ke liye
 app.get('/all-links', async (req, res) => {
